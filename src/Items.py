@@ -3,8 +3,6 @@
 Coins'''
 
 from src.constants import coin_img
-import pygame as pg
-from pygame.locals import *
 
 class Coin():
     '''Collectable object worth points'''

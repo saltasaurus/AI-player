@@ -1,5 +1,5 @@
 from src.Board import Board
-from src.Agents import Agent
+from src.Agents import Agent, ClosestCoinAgent
 from src.Items import Coin
 from src.constants import coin_img
 import pygame as pg
@@ -28,41 +28,44 @@ class Game():
         self.HEIGHT = height
         self.agentTypes = agents
         self.coins = []
+        self._FPS = 60
+        
 
         self._running = None
-
-        # Display
-        self._display_surf = None
 
     def on_init(self):
         '''Reset game'''
         # Initialize pygame
         pg.init()
         self.font = pg.font.SysFont('consalas', 20)
+
         self._running = True
 
+        self.clock = pg.time.Clock()
+        self.clock_tick = self.clock.tick(self._FPS)
+
+        self.init_pos = []
         self.create_board(self.WIDTH, self.HEIGHT)
-        self.create_coins(100)
+        self.create_coins(30)
         self.create_agents()
         del self.init_pos
 
+        
+
         # Initialize window
-        pg.display.set_caption("AI Coliseum")
-        self._display_surf = pg.display.set_mode((self.WIDTH, self.HEIGHT), pg.HWSURFACE)
+        self.board.set_window()
         
         # initialize surfaces
-        self._coin_surface = coin_img.convert()
-        for _, agent in self.agents.items():
-            agent._surface = agent.r_img.convert_alpha()
-
+        self.board.set_surfaces(self.agents)
 
     # Functions that initialize the board, coins and agents
     def create_board(self, width, height):
         self.board = Board(width, height)
 
     def create_coins(self, n: int):
-        # BUG
-        self.init_pos = []
+        '''Initialize all collectables' positions
+        
+        :param n: Number of collectables to create'''
         
         for _ in range(n):
             while(True):
@@ -76,11 +79,10 @@ class Game():
             self.coins.append(Coin(x,y,1))
 
     def create_agents(self):
-        # BUG
         self.agents = {}
 
+        # Loop through all agents
         for agent in self.agentTypes:
-            # Loop through all agents
             while(True):
                 # Find untaken location and set as key
                 x = random.randrange(0, self.WIDTH, 40)
@@ -89,9 +91,8 @@ class Game():
                 if key not in self.init_pos:
                     break
     
-            self.agents[key] = Agent(x, y)
+            self.agents[key] = ClosestCoinAgent(x=x, y=y, initial_coins=self.coins)
             self.agents[key].type = agent
-            print(f'Key: {key} Agent: {self.agents[key]}')
         
 
     # Functions that handle events
@@ -111,43 +112,37 @@ class Game():
     # Functions that handle gameplay
     def on_loop(self):
         for agent in self.agents.values():
-            # TODO
-            # Add agent.setTarget
-            # Add agent.target
-            # Add agent.update
-            pass
+            for agent in self.agents.values():
+                agent.setTarget(self.coins)
+                agent.target()
+                agent.update()
 
         for coin in self.coins:
-            for _, agent in self.agents.items():
+            for agent in self.agents.values():
                 if agent.x == coin.x and agent.y == coin.y:
-                    print("yay a coin")
+                    agent.score += coin.value
+                    if coin in self.coins:
+                        self.coins.remove(coin)
+                        if len(self.coins) == 0:
+                            self._running = False
+                            continue
+                    # Set agent's next target
+                    agent.setTarget(self.coins)
 
     def on_render(self):
-        # Render background
-        self._display_surf.fill(BLACK)
-
-        # Render coins
-        for coin in self.coins:
-            coin.draw(self._display_surf)
-
-        # Render agents
-        for agent in self.agents.values():
-            agent.draw(self._display_surf, agent._surface)
-        
-        # i=1
-        # for agent in self.agents.values():
-        #     agent.show_score(self._display_surf, i, self.WIDTH, self.HEIGHT, WHITE, self.font)
-        #     i+=1
-
-        pg.display.flip()
+        '''Calls board object to render game'''
+        self.board.render(self.coins, self.agents)
 
     def _run(self):
+        
         # Check for init failure
         if self.on_init() == False:
             self._running = False
+            
         
         # Main game loop
         while self._running:
+            self.clock.tick(self._FPS)
             # Check if user quits
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -155,7 +150,7 @@ class Game():
             pg.event.pump()
             self.on_loop()
             self.on_render()
-            time.sleep(50.0 / 1000.0)
+            # time.sleep(50.0 / 1000.0)
 
         # Actions after game ends
         print("Game over")
