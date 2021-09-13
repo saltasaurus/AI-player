@@ -1,3 +1,9 @@
+### Custom gitignore files ###
+src/sprites/*.txt
+
+
+### Default gitignore files ###
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
