@@ -3,7 +3,7 @@
 Specific agents are created using the Agent Superclass
 '''
 
-from src.constants import red_agent
+from src.constants import red_agent, penguin_agent
 
 import abc
 import pygame as pg
@@ -14,11 +14,13 @@ class Agent():
     
     New agents must define Heuristic function: get_target( )'''
 
-    step = 1
+    step = 2
 
     def __init__(self, agent_type, initial_x, initial_y):
-        self.r_img = red_agent
-        self.l_img = pg.transform.flip(red_agent, True, False)
+        # self.r_img = red_agent
+        # self.l_img = pg.transform.flip(red_agent, True, False)
+        self.l_img = penguin_agent
+        self.r_img = pg.transform.flip(penguin_agent, True, False)
         self.surface = None
         self.x = initial_x
         self.y = initial_y
@@ -26,29 +28,31 @@ class Agent():
         self.targetCoin = None
         self.type = agent_type
         self.action = None
+        # self.moves_list = set()
 
     def update(self):
         '''Update agent based on action taken'''
-        if self.action == 'right':
-            self.x = self.x + self.step
-        elif self.action == 'left':
-            self.x = self.x - self.step
-        elif self.action == 'up':
-            self.y = self.y - self.step
-        elif self.action == 'down':
-            self.y = self.y + self.step
+        if self.action in self.moves_list:
+            if self.action == 'right':
+                self.x = self.x + self.step
+            elif self.action == 'left':
+                self.x = self.x - self.step
+            elif self.action == 'up':
+                self.y = self.y - self.step
+            elif self.action == 'down':
+                self.y = self.y + self.step
         else:
-            print('Raise error here')
+            print("standing still")
 
     def moveLeft(self):
         '''Sets action when moving left'''
         self.action = 'left'
-        self._surface = self.r_img.convert_alpha()
+        self._surface = self.l_img.convert_alpha()
 
     def moveRight(self):
         '''Sets action when moving right'''
         self.action = 'right'
-        self._surface = self.l_img.convert_alpha()
+        self._surface = self.r_img.convert_alpha()
 
     def moveUp(self):
         '''Sets action when moving up'''
@@ -60,6 +64,19 @@ class Agent():
 
     def show_score(self):
         pass
+
+    # BUG -> Still collide and overlap
+    def get_moves(self, agents):
+        self.moves_list = set()
+        for agent in agents:
+            if ((self.x + self.step) != agent.x):
+                self.moves_list.add('right')
+            if ((self.x - self.step) != agent.x):
+                self.moves_list.add('left')
+            if ((self.y + self.step) != agent.y):
+                self.moves_list.add('down')
+            if ((self.y - self.step) != agent.y):
+                self.moves_list.add('up')
 
     def target(self):
         tx = self.targetCoin.x
@@ -77,6 +94,7 @@ class Agent():
                 self.moveUp()
 
     def distanceToCoin(self, coin: object) -> float:
+        '''Calculate distance between Agent and a Coin'''
         return (((self.x - coin.x) ** 2 + (self.y - coin.y) ** 2) ** .5) / 10
 
     def draw(self, surface, image):

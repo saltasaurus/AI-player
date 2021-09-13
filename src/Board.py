@@ -4,6 +4,7 @@ import pygame as pg
 from src.constants import coin_img
 
 BLACK = (0,0,0)
+LIGHT_BLUE = (185,232,234)
 
 class Board():
     '''The area all game pieces lie on
@@ -25,7 +26,7 @@ class Board():
         :param agents: Contains all agents
         '''
         # Render background
-        self._display_surf.fill(BLACK)
+        self._display_surf.fill(LIGHT_BLUE)
 
         # Render coins
         for coin in coins:

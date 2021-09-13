@@ -1,10 +1,8 @@
 from src.Board import Board
-from src.Agents import Agent, ClosestCoinAgent
+from src.Agents import ClosestCoinAgent
 from src.Items import Coin
-from src.constants import coin_img
 import pygame as pg
 from pygame.locals import *
-import time
 import random
 
 # Colors
@@ -49,8 +47,6 @@ class Game():
         self.create_coins(30)
         self.create_agents()
         del self.init_pos
-
-        
 
         # Initialize window
         self.board.set_window()
@@ -112,10 +108,10 @@ class Game():
     # Functions that handle gameplay
     def on_loop(self):
         for agent in self.agents.values():
-            for agent in self.agents.values():
-                agent.setTarget(self.coins)
-                agent.target()
-                agent.update()
+            agent.setTarget(self.coins)
+            agent.get_moves(self.agents.values())
+            agent.target()
+            agent.update()
 
         for coin in self.coins:
             for agent in self.agents.values():

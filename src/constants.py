@@ -8,5 +8,6 @@ green_img
 
 import pygame as pg
 
-coin_img = pg.image.load("src/sprites/default/coin.png")
-red_agent = pg.image.load("src/sprites/default/red_player.png")
+coin_img = pg.image.load("src/sprites/default/collectables/coin.png")
+red_agent = pg.image.load("src/sprites/default/agents/red_player.png")
+penguin_agent = pg.image.load("src/sprites/penguins/penguin_left.png")

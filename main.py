@@ -2,7 +2,7 @@
 
 from src.Game import Game
 
-from argparse import ArgumentParser
+# from argparse import ArgumentParser
 
 
 if __name__ == "__main__":
@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     width = 800
     height = 600
-    agents = ["Agent Oso", "Brimachine"]
+    agents = ["Agent Varnson", "BriMachine", "Dinoboy", "Rico", "Agentlement"]
 
     print("Creating game")
     game = Game(width, height, agents)
