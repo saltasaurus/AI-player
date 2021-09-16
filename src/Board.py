@@ -18,6 +18,7 @@ class Board():
 
         # Display
         self._display_surf = None
+        self.font = pg.font.SysFont('consalas', 20)
 
     def render(self, coins: list, agents: dict) -> None:
         '''Display background, collectables and agents
@@ -33,8 +34,10 @@ class Board():
             coin.draw(self._display_surf)
 
         # Render agents
-        for agent in agents.values():
+        for i, agent in enumerate(agents.values()):
             agent.draw(self._display_surf, agent._surface)
+            agent.show_score(self._display_surf, i, self.WIDTH, (0,0,0), self.font)
+        
         
         pg.display.flip()
 

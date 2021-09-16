@@ -35,7 +35,7 @@ class Game():
         '''Reset game'''
         # Initialize pygame
         pg.init()
-        self.font = pg.font.SysFont('consalas', 20)
+        # self.font = pg.font.SysFont('consalas', 20)
 
         self._running = True
 
@@ -44,7 +44,7 @@ class Game():
 
         self.init_pos = []
         self.create_board(self.WIDTH, self.HEIGHT)
-        self.create_coins(30)
+        self.create_coins(100)
         self.create_agents()
         del self.init_pos
 
@@ -109,25 +109,40 @@ class Game():
     def on_loop(self):
         for agent in self.agents.values():
             agent.setTarget(self.coins)
-            agent.get_moves(self.agents.values())
             agent.target()
+            agent.get_moves(self.agents.values())
             agent.update()
 
-        for coin in self.coins:
-            for agent in self.agents.values():
-                if agent.x == coin.x and agent.y == coin.y:
+            for coin in self.coins:
+                get_new_target = False
+                if agent.collect_coin(coin):
                     agent.score += coin.value
+                    if coin == agent.targetCoin:
+                        get_new_target = True
                     if coin in self.coins:
                         self.coins.remove(coin)
                         if len(self.coins) == 0:
                             self._running = False
-                            continue
+                            return
                     # Set agent's next target
-                    agent.setTarget(self.coins)
+                    if get_new_target:
+                        agent.setTarget(self.coins)
 
     def on_render(self):
         '''Calls board object to render game'''
         self.board.render(self.coins, self.agents)
+
+    def get_winner(self):
+        print("Final Scores: ")
+        winner = None
+        winner_score = -1
+        for _, agent in self.agents.items():
+            print(f'{(agent.type)} | Score: {str(agent.score)}')
+            if agent.score > winner_score:
+                winner = agent
+                winner_score = agent.score
+        # log winner and rest of the scores
+        print(f'({winner.type}) wins with a score of {str(winner.score)}!')
 
     def _run(self):
         
@@ -135,7 +150,6 @@ class Game():
         if self.on_init() == False:
             self._running = False
             
-        
         # Main game loop
         while self._running:
             self.clock.tick(self._FPS)
@@ -146,10 +160,10 @@ class Game():
             pg.event.pump()
             self.on_loop()
             self.on_render()
-            # time.sleep(50.0 / 1000.0)
 
         # Actions after game ends
-        print("Game over")
+        self.get_winner()
+        
         self.on_cleanup()
 
     def __str__(self) -> str:
