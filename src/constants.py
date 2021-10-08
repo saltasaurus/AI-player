@@ -18,3 +18,10 @@ penguin_right = pg.image.load(path+"penguins/penguin_right.png")
 penguin_up = pg.image.load(path+"penguins/penguin_up.png")
 penguin_down = pg.image.load(path+"penguins/penguin_down.png")
 fish_img = pg.image.load(path+"penguins/fish.png")
+
+
+colors = {
+    "BLACK": (0,0,0),
+    "WHITE": (255, 255, 255), 
+    "RED": (255, 0, 0)
+}

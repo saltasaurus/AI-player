@@ -1,10 +1,5 @@
-thing = {'left': 'LEFT'}
 
-if 'up' in thing.keys():
-    up = thing['up']
-else:
-    up = None
-  
+length = [0, 1, 2, 3, 4]
+print(len(length))
 
-print(thing['left'])
-print(up)
+print(length[5])
